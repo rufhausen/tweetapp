@@ -41,7 +41,7 @@ class HomeController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param MentionRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function postMentions(MentionRequest $request)
@@ -49,7 +49,6 @@ class HomeController extends Controller
         $twitterUser = TwitterUser::firstOrCreate([
             'twitter_handle' => $request->input('twitter_handle'),
         ]);
-
 
         //if cache date/time is null of more than an hour, do api update
         if (!$twitterUser->cached_since || Carbon::create()->subHour()->gt(Carbon::parse($twitterUser->cached_since))) {
@@ -79,7 +78,6 @@ class HomeController extends Controller
         $profile = json_decode($twitterUser->profile, true);
 
         return view('profile', compact('profile'));
-
     }
 
     /**

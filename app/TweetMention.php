@@ -18,12 +18,5 @@ class TweetMention extends Model
     {
         return $this->hasOne(TwitterUser::class, 'id', 'mentioned_user_id');
     }
-
-    //public function tweets()
-    //{
-    //    return $this->hasOne(Tweet::class, 'id', 'tweet_id');
-    //}
-
-
 }
 
