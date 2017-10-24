@@ -46,6 +46,7 @@
                 <!-- Right Side Of Navbar -->
                 <ul class="nav navbar-nav navbar-right">
                     <!-- Authentication Links -->
+                    <span class="text-muted"><small>Laravel {{ App::VERSION() }}</small></span>
 
                 </ul>
             </div>
@@ -54,44 +55,45 @@
     <div class="container">
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
+                @foreach ($errors->all() as $error)
+                    <div class="alert alert-danger">{{ $error }}</div>
+                @endforeach
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                @if(session('info'))
+                    <div class="alert alert-info">{{ session('info') }}</div>
+                @endif
+                @if(session('warning'))
+                    <div class="alert alert-warning">{{ session('warning') }}</div>
+                @endif
+            </div>
+        </div>
+
+        <form method="post" action="mentions">
+            {{ csrf_field() }}
+            <div class="form-group">
                 <div class="row">
-                    <div class="col-md-12">
-                        @foreach ($errors->all() as $error)
-                            <div class="alert alert-danger">{{ $error }}</div>
-                        @endforeach
-                        @if(session('success'))
-                            <div class="alert alert-success">{{ session('success') }}</div>
-                        @endif
-                        @if(session('info'))
-                            <div class="alert alert-info">{{ session('info') }}</div>
-                        @endif
-                        @if(session('warning'))
-                            <div class="alert alert-warning">{{ session('warning') }}</div>
-                        @endif
-                    </div>
-                </div>
-                <form method="post" action="mentions">
-                    {{ csrf_field() }}
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-md-11">
-                                <div class="input-group">
-                                    <div class="input-group-addon"><i class="fa fa-at" aria-hidden="true"></i></div>
-                                <input type="text"
-                                       name="twitter_handle"
-                                       class="form-control input-lg"
-                                       id="twitter_handle"
-                                       placeholder="Twitter Handle"
-                                       value="{{ ($twitterUser ? $twitterUser->twitter_handle : '') }}"
-                                >
-                                </div>
-                            </div>
-                            <div class="col-md-1">
-                                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
-                            </div>
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="fa fa-at" aria-hidden="true"></i></div>
+                            <input type="text"
+                                   name="twitter_handle"
+                                   class="form-control input-lg"
+                                   id="twitter_handle"
+                                   placeholder="Twitter Handle"
+                                   value="{{ ($twitterUser ? $twitterUser->twitter_handle : '') }}"
+                            >
                         </div>
                     </div>
-                </form>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row" style="min-height: 400px">
+            <div class="col-md-12">
                 @if($twitterUser)
                     <h3 class="text-center">{{$twitterUser->tweets()->count() }} Tweets Searched</h3>
                 @endif
@@ -101,12 +103,13 @@
                             <small>
                                 <strong>
                                     Results cached
-                                    for <mark>{{ $twitterUser->cached_since->diffForHumans(null, true) }}</mark>
+                                    for
+                                    <mark>{{ $twitterUser->cached_since->diffForHumans(null, true) }}</mark>
                                 </strong>
                             </small>
                         </div>
                     @endif
-                        {{ $mentions->appends(['twitter_handle' => $twitterUser->twitter_handle])->links() }}
+                    {{ $mentions->appends(['twitter_handle' => $twitterUser->twitter_handle])->links() }}
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -121,16 +124,17 @@
                             <tr>
                                 <th scope="row">
                                     <div><h4><a data-toggle="modal" class="openProfile"
-                                            data-twitter-handle="{{ $mention->mentioned->twitter_handle }}"
-                                            data-target="#myModal">
-                                            {{ $mention->mentioned->twitter_handle }}
-                                        </a>
-                                            </h4>
+                                                data-twitter-handle="{{ $mention->mentioned->twitter_handle }}"
+                                                data-target="#myModal">
+                                                {{ $mention->mentioned->twitter_handle }}
+                                            </a>
+                                        </h4>
                                     </div>
                                     <div>
                                         <form method="post" action="mentions">
                                             {{ csrf_field() }}
-                                            <input type="hidden" name="twitter_handle" value="{{ $mention->mentioned->twitter_handle }}">
+                                            <input type="hidden" name="twitter_handle"
+                                                   value="{{ $mention->mentioned->twitter_handle }}">
                                             <button type="submit" class="btn btn-danger btn-sm"><i
                                                         class="fa fa-line-chart" aria-hidden="true"></i> Analyze
                                             </button>
@@ -154,9 +158,14 @@
 
                         </tbody>
                     </table>
+                @else
+                    <div class="text-center" style="margin-top: 50px">
+                        <h4 class="muted">Enter a Twitter Handle to see some results.</h4>
+                    </div>
                 @endif
             </div>
         </div>
+        <div class="text-muted text-center">~end~</div>
     </div>
 
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -175,8 +184,8 @@
             </div>
         </div>
     </div>
-
 </div>
+
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
     $('.openProfile').on('click', function () {
