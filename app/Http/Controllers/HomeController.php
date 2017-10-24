@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MentionRequest;
 use App\Services\TwitterApi;
 use App\Tweet;
 use App\TweetMention;
@@ -18,21 +19,22 @@ class HomeController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         $mentions    = [];
         $twitterUser = [];
 
-        if (session('twitter_user_id')) {
-            $id          = session('twitter_user_id');
-            $twitterUser = TwitterUser::findOrFail($id);
-            $mentions    = TweetMention::groupBy('mentioned_user_id')
+        if ($request->input('twitter_handle')) {
+            $twitterHandle = $request->input('twitter_handle');
+            $twitterUser   = TwitterUser::where('twitter_handle', $twitterHandle)->firstOrFail();
+            $mentions      = TweetMention::groupBy('mentioned_user_id')
                 ->select('*', \DB::raw('count(*) as total'))
-                ->where('twitter_user_id', $id)
+                ->where('twitter_user_id', $twitterUser->id)
                 ->orderBy('total', 'DESC')
-                ->get();
+                ->paginate(10);
         }
 
         return view('home', compact('mentions', 'twitterUser'));
@@ -42,7 +44,7 @@ class HomeController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function postMentions(Request $request)
+    public function postMentions(MentionRequest $request)
     {
         $twitterUser = TwitterUser::firstOrCreate([
             'twitter_handle' => $request->input('twitter_handle'),
@@ -54,9 +56,13 @@ class HomeController extends Controller
             $this->handleApiUpdate($twitterUser);
         }
 
-        return redirect()->to('/')->with('twitter_user_id', $twitterUser->id);
+        return redirect()->route('home', ['twitter_handle' => $twitterUser->twitter_handle]);
     }
 
+    /**
+     * @param $twitterHandle
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getProfile($twitterHandle)
     {
         $twitterUser = TwitterUser::where('twitter_handle', $twitterHandle)->first();
@@ -64,6 +70,8 @@ class HomeController extends Controller
         if (!$twitterUser) {
             abort(404);
         }
+
+        //only make another API call if we haven't already saved the profile.
         if (empty($twitterUser->profile)) {
             $twitterUser->profile = json_encode($this->twitterApi->getUserByScreenName($twitterHandle));
             $twitterUser->save();
@@ -76,7 +84,6 @@ class HomeController extends Controller
 
     /**
      * @param TwitterUser $twitterUser
-     * @param TwitterApi $twitterApi
      * @return mixed
      */
     private function handleApiUpdate(TwitterUser $twitterUser)

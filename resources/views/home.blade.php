@@ -33,7 +33,7 @@
 
                 <!-- Branding Image -->
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+                    <i class="fa fa-twitter" aria-hidden="true"></i> {{ config('app.name', 'Laravel') }}
                 </a>
             </div>
 
@@ -106,6 +106,7 @@
                             </small>
                         </div>
                     @endif
+                        {{ $mentions->appends(['twitter_handle' => $twitterUser->twitter_handle])->links() }}
                     <table class="table table-striped">
                         <thead>
                         <tr>

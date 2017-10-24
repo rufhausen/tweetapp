@@ -19,12 +19,6 @@ use App\TwitterUser;
 Route::get('test', function()
 {
 
-   $twitter = new TwitterApi();
-
-   $statuses =  $twitter->getUserByScreenName('rufhausen');
-
-   dd($statuses);
-
 });
 
 Route::get('/', 'HomeController@index')->name('home');

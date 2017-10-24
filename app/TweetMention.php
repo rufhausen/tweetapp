@@ -11,7 +11,7 @@ class TweetMention extends Model
     protected $dates = [
         'created_at',
         'updated_at',
-        'tweet_created_at'
+        'tweet_created_at',
     ];
 
     public function mentioned()

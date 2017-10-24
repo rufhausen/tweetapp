@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class TwitterUser extends Model
 {
     protected $fillable = [
-      'twitter_handle'
+        'twitter_handle',
     ];
 
     protected $dates = [
         'created_at',
         'updated_at',
-        'cached_since'
+        'cached_since',
     ];
 
     public function mentions()
