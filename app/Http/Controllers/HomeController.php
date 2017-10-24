@@ -28,7 +28,7 @@ class HomeController extends Controller
         $twitterUser = [];
 
         if ($request->input('twitter_handle')) {
-            $twitterHandle = $request->input('twitter_handle');
+            $twitterHandle = removeAt($request->input('twitter_handle'));
             $twitterUser   = TwitterUser::where('twitter_handle', $twitterHandle)->firstOrFail();
             $mentions      = TweetMention::groupBy('mentioned_user_id')
                 ->select('*', \DB::raw('count(*) as total'))
@@ -47,7 +47,7 @@ class HomeController extends Controller
     public function postMentions(MentionRequest $request)
     {
         $twitterUser = TwitterUser::firstOrCreate([
-            'twitter_handle' => $request->input('twitter_handle'),
+            'twitter_handle' => removeAt($request->input('twitter_handle')),
         ]);
 
         //if cache date/time is null of more than an hour, do api update
