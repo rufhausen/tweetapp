@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-
     public function __construct(TwitterApi $twitterApi)
     {
         $this->twitterApi = $twitterApi;
@@ -50,7 +49,7 @@ class HomeController extends Controller
             'twitter_handle' => removeAt($request->input('twitter_handle')),
         ]);
 
-        //if cache date/time is null of more than an hour, do api update
+        //if cache date/time is null for more than an hour, do api update
         if (!$twitterUser->cached_since || Carbon::create()->subHour()->gt(Carbon::parse($twitterUser->cached_since))) {
             $this->handleApiUpdate($twitterUser);
         }
