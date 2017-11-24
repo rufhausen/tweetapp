@@ -1,0 +1,17 @@
+machine:
+  timezone: America/Denver
+  php:
+    version: 7.1.0
+  services:
+   - mysql
+  environment:
+      APP_ENV: local
+      APP_KEY: your_secret_key
+
+dependencies:
+  override:
+    - composer install --prefer-source --no-interaction
+
+test:
+  override:
+    - vendor/bin/phpunit
