@@ -166,6 +166,7 @@
             </div>
         </div>
         <div class="text-muted text-center">~end~</div>
+        <div class="text-muted text-center">envoyer</div>
     </div>
 
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
